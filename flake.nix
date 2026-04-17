@@ -9,7 +9,7 @@
     {
       devShell = pkgs.mkShell {
         buildInputs = with pkgs; [
-          pnpm
+          bun
           nodejs_24
           uv
         ];
