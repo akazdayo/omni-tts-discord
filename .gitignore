@@ -1,0 +1,6 @@
+node_modules
+.env
+.venv
+__pycache__
+voices/*.wav
+voices/*.jsonl
