@@ -1,6 +1,7 @@
 import { Client, Events, GatewayIntentBits, Interaction, Message, VoiceState } from 'discord.js';
-import { commands } from './commands/commands.js';
+import { commandList, commands } from './commands/commands.js';
 import { connections, removeConnections } from './commands/join.js';
+import { handleSpeakerSelect, selectedSpeakers } from './commands/speaker.js';
 import { createAudioResource } from '@discordjs/voice';
 import { generateVoice } from './lib/generate.js';
 import { conversionMessage } from './lib/conversionMessage.js';
@@ -14,9 +15,19 @@ const client = new Client({ intents: [
   GatewayIntentBits.MessageContent
 ]});
 
-client.once(Events.ClientReady, () => console.log('Ready!'));
+client.once(Events.ClientReady, async (readyClient) => {
+  await readyClient.application.commands.set(
+    commandList.map((command) => command.data.toJSON())
+  );
+  console.log('Ready!');
+});
 
 client.on(Events.InteractionCreate, async (interaction: Interaction) => {
+  if (interaction.isStringSelectMenu() && interaction.customId === 'speakers') {
+    await handleSpeakerSelect(interaction);
+    return;
+  }
+
   if (!interaction.isChatInputCommand()) return;
   const command = commands.get(interaction.commandName);
   if (!command) return;
@@ -36,7 +47,8 @@ client.on(Events.MessageCreate, async (message: Message) => {
 
   const { player } = voiceChannel
   const messageText = await conversionMessage(message.content);
-  const voice = await generateVoice(messageText, '874568803256786945');
+  const speaker = selectedSpeakers[message.author.id] ?? '874568803256786945';
+  const voice = await generateVoice(messageText, speaker);
   if (!voice) return;
   const audioResouce = createAudioResource(voice);
   player.play(audioResouce)
