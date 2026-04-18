@@ -29,7 +29,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   } else if (!interaction.channel?.isSendable()) {
     await interaction.reply({ content: '私テキストの送信権限なさそうかも', flags: MessageFlags.Ephemeral })
     return;
-  } else if (connections[vc.guild.id].voiceChannel === vc.id) {
+  } else if (connections[vc.guild.id]?.voiceChannel === vc.id) {
     await interaction.reply({ content: `もうそのVCに参加してるかも？`, flags: MessageFlags.Ephemeral })
     return;
   } else if (connections[vc.guild.id]) {
