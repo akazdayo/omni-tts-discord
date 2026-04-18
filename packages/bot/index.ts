@@ -1,9 +1,10 @@
-import { Client, Events, GatewayIntentBits, Interaction, Message } from 'discord.js';
+import { Client, Events, GatewayIntentBits, Interaction, Message, VoiceState } from 'discord.js';
 import { commands } from './commands/commands.js';
-import { connections } from './commands/join.js';
+import { connections, removeConnections } from './commands/join.js';
 import { createAudioResource } from '@discordjs/voice';
 import { generateVoice } from './lib/generate.js';
 import { conversionMessage } from './lib/conversionMessage.js';
+import { leaveWhenEmpty } from './lib/leaveWhenEmpty.js';
 
 
 const client = new Client({ intents: [
@@ -28,13 +29,38 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
 
 client.on(Events.MessageCreate, async (message: Message) => {
   if (message.author.bot) return;
-  if (connections.some(vc => vc.targetChannel !== message.channel.id)) return;
-  const { player } = connections.find(vc => vc.targetChannel === message.channel.id)!;
+  const voiceChannel = Object.values(connections).find(
+    (vc) => vc.targetChannel === message.channelId
+  )
+  if (!voiceChannel) return;
+
+  const { player } = voiceChannel
   const messageText = await conversionMessage(message.content);
   const voice = await generateVoice(messageText, '874568803256786945');
   if (!voice) return;
   const audioResouce = createAudioResource(voice);
   player.play(audioResouce)
+});
+
+client.on(Events.VoiceStateUpdate, async (oldState: VoiceState, newState: VoiceState) => {
+  if (oldState.channelId === newState.channelId) return;
+
+  const guildId = newState.guild.id;
+  const botId = newState.client.user.id;
+  const connectionEntry = connections[guildId];
+
+  if (newState.id === botId) {
+    if (!connectionEntry) return;
+    if (newState.channelId) {
+      connectionEntry.voiceChannel = newState.channelId;
+      return;
+    }
+    connectionEntry.connection.destroy();
+    removeConnections(guildId);
+    return;
+  }
+
+  leaveWhenEmpty(oldState)
 });
 
 client.login(process.env.DISCORD_TOKEN);
