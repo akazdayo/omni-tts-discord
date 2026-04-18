@@ -3,4 +3,5 @@ node_modules
 .venv
 __pycache__
 voices/*.wav
+!voices/senpai.wav
 voices/*.jsonl
