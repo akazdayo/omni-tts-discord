@@ -29,7 +29,7 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
 
 client.on(Events.MessageCreate, async (message: Message) => {
   if (message.author.bot) return;
-  if (connections.some(vc => vc.targetChannel !== message.channel.id)) return;
+  if (!connections.some(vc => vc.targetChannel === message.channel.id)) return;
   const { player } = connections.find(vc => vc.targetChannel === message.channel.id)!;
   const messageText = await conversionMessage(message.content);
   const voice = await generateVoice(messageText, '874568803256786945');
