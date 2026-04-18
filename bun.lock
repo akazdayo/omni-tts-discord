@@ -10,8 +10,6 @@
       },
       "devDependencies": {
         "lefthook": "^2.1.6",
-        "oxfmt": "^0.45.0",
-        "oxlint": "^1.60.0",
         "tsgolint": "^0.0.1",
         "ultracite": "7.6.0",
         "vite-plus": "^0.1.18",
