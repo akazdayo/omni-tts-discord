@@ -1,4 +1,4 @@
-export async function getSpeakers(): Promise<string[]> {
+export const getSpeakers = async (): Promise<string[]> => {
   const res = await fetch("http://localhost:8000/speaker_list");
 
   if (!res.ok || !res.body) {
@@ -7,5 +7,4 @@ export async function getSpeakers(): Promise<string[]> {
 
   const data: string[] = await res.json();
   return data;
-}
-
+};
