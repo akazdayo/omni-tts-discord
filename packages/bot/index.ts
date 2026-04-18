@@ -1,9 +1,10 @@
-import { Client, Events, GatewayIntentBits, Interaction, Message } from 'discord.js';
+import { Client, Events, GatewayIntentBits, Interaction, Message, VoiceState } from 'discord.js';
 import { commands } from './commands/commands.js';
 import { connections } from './commands/join.js';
 import { createAudioResource } from '@discordjs/voice';
 import { generateVoice } from './lib/generate.js';
 import { conversionMessage } from './lib/conversionMessage.js';
+import { leaveWhenEmpty } from './lib/leaveWhenEmpty.js';
 
 
 const client = new Client({ intents: [
@@ -35,6 +36,11 @@ client.on(Events.MessageCreate, async (message: Message) => {
   if (!voice) return;
   const audioResouce = createAudioResource(voice);
   player.play(audioResouce)
+});
+
+client.on(Events.VoiceStateUpdate, async (oldState: VoiceState, newState: VoiceState) => {
+  if (oldState.channelId === newState.channelId) return;
+  leaveWhenEmpty(oldState)
 });
 
 client.login(process.env.DISCORD_TOKEN);
