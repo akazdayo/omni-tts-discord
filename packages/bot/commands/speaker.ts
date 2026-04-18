@@ -7,15 +7,14 @@ export const data = new SlashCommandBuilder()
   .setName('speaker')
   .setDescription('Speakerを変更できるよ');
 
-const speakers = await getSpeakers();
 export const selectedSpeakers: SelectedSpeakers = {};
 
-const buildButtons = () => {
+const buildButtons = (speakers: string[]) => {
   const speakerSelectMenu = new StringSelectMenuBuilder()
   .setCustomId('speakers')
   .setPlaceholder('Select a speaker')
   .addOptions(
-    speakers.map(userId => 
+    speakers.map(userId =>
       new StringSelectMenuOptionBuilder()
         .setLabel(`<@${userId}>`)
         .setValue(userId)
@@ -27,7 +26,8 @@ const buildButtons = () => {
 }
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  const buttons = buildButtons();
+  const speakers = await getSpeakers();
+  const buttons = buildButtons(speakers);
   await interaction.reply({ components: [buttons] });
 }
 
