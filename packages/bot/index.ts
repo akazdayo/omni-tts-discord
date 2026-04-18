@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits, Interaction, Message, REST, Routes, VoiceState } from 'discord.js';
+import { Client, Events, GatewayIntentBits, Interaction, Message, VoiceState } from 'discord.js';
 import { commandList, commands } from './commands/commands.js';
 import { connections, removeConnections } from './commands/join.js';
 import { handleSpeakerSelect, selectedSpeakers } from './commands/speaker.js';
@@ -6,22 +6,6 @@ import { createAudioResource } from '@discordjs/voice';
 import { generateVoice } from './lib/generate.js';
 import { conversionMessage } from './lib/conversionMessage.js';
 import { leaveWhenEmpty } from './lib/leaveWhenEmpty.js';
-
-async function registerCommands() {
-  const token = process.env.DISCORD_TOKEN;
-  const clientId = process.env.DISCORD_CLIENT_ID;
-
-  if (!token || !clientId) {
-    throw new Error('DISCORD_TOKEN and DISCORD_CLIENT_ID are required');
-  }
-
-  const rest = new REST({ version: '10' }).setToken(token);
-  await rest.put(
-    Routes.applicationCommands(clientId),
-    { body: [...commands.values()].map((command) => command.data.toJSON()) }
-  );
-  console.log(`Registered ${commands.size} global commands`);
-}
 
 
 const client = new Client({ intents: [
@@ -91,12 +75,4 @@ client.on(Events.VoiceStateUpdate, async (oldState: VoiceState, newState: VoiceS
   leaveWhenEmpty(oldState)
 });
 
-async function main() {
-  await registerCommands();
-  await client.login(process.env.DISCORD_TOKEN);
-}
-
-void main().catch((error) => {
-  console.error('Failed to start bot', error);
-  process.exit(1);
-});
+client.login(process.env.DISCORD_TOKEN);
