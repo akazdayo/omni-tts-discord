@@ -1,6 +1,6 @@
 import { Client, Events, GatewayIntentBits, Interaction, Message, VoiceState } from 'discord.js';
 import { commands } from './commands/commands.js';
-import { connections } from './commands/join.js';
+import { connections, removeConnections } from './commands/join.js';
 import { createAudioResource } from '@discordjs/voice';
 import { generateVoice } from './lib/generate.js';
 import { conversionMessage } from './lib/conversionMessage.js';
@@ -44,6 +44,22 @@ client.on(Events.MessageCreate, async (message: Message) => {
 
 client.on(Events.VoiceStateUpdate, async (oldState: VoiceState, newState: VoiceState) => {
   if (oldState.channelId === newState.channelId) return;
+
+  const guildId = newState.guild.id;
+  const botId = newState.client.user.id;
+  const connectionEntry = connections[guildId];
+
+  if (newState.id === botId) {
+    if (!connectionEntry) return;
+    if (newState.channelId) {
+      connectionEntry.voiceChannel = newState.channelId;
+      return;
+    }
+    connectionEntry.connection.destroy();
+    removeConnections(guildId);
+    return;
+  }
+
   leaveWhenEmpty(oldState)
 });
 
