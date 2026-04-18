@@ -10,8 +10,7 @@ export function leaveWhenEmpty(oldState: VoiceState) {
   if (!connection) return;
 
   const botChannelId = channel.guild.members.me?.voice.channelId;
-  if (!botChannelId) return;
-  if (botChannelId !== channel.id) return;
+  if (!botChannelId && botChannelId !== channel.id) return;
 
   const humanCount = channel.members.filter((member) => !member.user.bot).size;
   if (humanCount > 0) return;
