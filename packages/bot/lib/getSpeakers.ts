@@ -8,4 +8,3 @@ export async function getSpeakers(): Promise<string[]> {
   const data: string[] = await res.json();
   return data;
 }
-

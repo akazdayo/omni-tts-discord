@@ -2,9 +2,9 @@ import { Readable } from "node:stream";
 
 export async function generateVoice(text: string, speaker: string): Promise<Readable> {
   const res = await fetch("http://localhost:8000/generate", {
-    method: "POST",
+    body: JSON.stringify({ speaker, text }),
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, speaker }),
+    method: "POST",
   });
 
   if (!res.ok || !res.body) {

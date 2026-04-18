@@ -1,8 +1,8 @@
 import { getDlsiteTitle } from "./getDlsiteTitle.js";
 
-export async function conversionMessage(msg: string){
-    const replaced = await replaceRJCodes(msg);
-    return replaced;
+export async function conversionMessage(msg: string) {
+  const replaced = await replaceRJCodes(msg);
+  return replaced;
 }
 
 async function replaceRJCodes(text: string) {

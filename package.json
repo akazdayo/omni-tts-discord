@@ -2,14 +2,23 @@
   "name": "voice-clone-bot-select",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
   "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "check": "ultracite check",
+    "fix": "ultracite fix",
+    "prepare": "lefthook install"
+  },
   "dependencies": {
     "@discordjs/voice": "^0.19.2",
     "discord.js": "^14.26.3"
+  },
+  "devDependencies": {
+    "lefthook": "^2.1.6",
+    "oxfmt": "^0.45.0",
+    "oxlint": "^1.60.0",
+    "ultracite": "7.6.0"
   }
 }
