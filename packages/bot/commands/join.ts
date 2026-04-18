@@ -8,6 +8,22 @@ export interface VoiceChannels {
 }
 export const connections: VoiceChannels[] = [];
 
+function removeConnections(predicate: (voiceChannel: VoiceChannels) => boolean) {
+  for (let i = connections.length - 1; i >= 0; i--) {
+    if (predicate(connections[i])) {
+      connections.splice(i, 1);
+    }
+  }
+}
+
+export function removeConnectionsForGuild(guildId: string) {
+  removeConnections(({ connection }) => connection.joinConfig.guildId === guildId);
+}
+
+export function removeConnectionsForTargetChannel(targetChannel: string) {
+  removeConnections((voiceChannel) => voiceChannel.targetChannel === targetChannel);
+}
+
 export const data = new SlashCommandBuilder()
   .setName('join')
   .setDescription('じょいん');
@@ -38,6 +54,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
+  removeConnectionsForGuild(vc.guild.id);
+  removeConnectionsForTargetChannel(textChannel);
   connections.push({connection: connection, player: player, targetChannel: textChannel});
   await interaction.reply({content: '全部成功したらしい', flags: MessageFlags.Ephemeral})
 }
