@@ -9,6 +9,10 @@ export interface VoiceChannels {
 }
 export const connections: Record<string, VoiceChannels> = {};
 
+export function removeConnections(guildId: string) {
+  delete connections[guildId]
+}
+
 export const data = new SlashCommandBuilder()
   .setName('join')
   .setDescription('じょいん');
@@ -26,10 +30,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     await interaction.reply({ content: '私テキストの送信権限なさそうかも', flags: MessageFlags.Ephemeral })
     return;
   } else if (connections[vc.guild.id].voiceChannel === vc.id) {
-    await interaction.reply({ content: `もう<#${vc.guild.id}>に参加してるかも？`, flags: MessageFlags.Ephemeral })
+    await interaction.reply({ content: `もうそのVCに参加してるかも？`, flags: MessageFlags.Ephemeral })
     return;
   } else if (connections[vc.guild.id]) {
-    await interaction.reply({ content: 'もう別のVCに参加してるかも？', flags: MessageFlags.Ephemeral })
+    await interaction.reply({ content: `もう<#${vc.guild.id}>に参加してるかも？`, flags: MessageFlags.Ephemeral })
     return;
   }
   const connection = joinVoiceChannel({
