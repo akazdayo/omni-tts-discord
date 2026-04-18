@@ -1,5 +1,5 @@
 import type { Interaction, Message, VoiceState } from "discord.js";
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { Client, Events, GatewayIntentBits, MessageFlags } from "discord.js";
 import { commandList, commands } from "./commands/commands.js";
 import { connections, removeConnections } from "./commands/join.js";
 import { handleSpeakerSelect, selectedSpeakers } from "./commands/speaker.js";
@@ -38,7 +38,7 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
   try {
     await command.execute(interaction);
   } catch {
-    await interaction.reply({ content: "Error", ephemeral: true });
+    await interaction.reply({ content: "Error", flags: MessageFlags.Ephemeral });
   }
 });
 
