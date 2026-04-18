@@ -15,4 +15,9 @@ const replaceRJCodes = async (text: string) => {
   return result;
 };
 
-export const conversionMessage = (message: string) => replaceRJCodes(message);
+const replaceTilde = (text: string) => text.replaceAll(/[~〜]/g, "ー");
+
+export const conversionMessage = async (message: string) => {
+  const replaced = await replaceRJCodes(message);
+  return replaceTilde(replaced);
+};
