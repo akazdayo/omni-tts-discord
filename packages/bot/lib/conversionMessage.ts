@@ -2,7 +2,7 @@ import { getDlsiteTitle } from "./getDlsiteTitle.js";
 
 export async function conversionMessage(msg: string){
     const replaced = await replaceRJCodes(msg);
-    return replaced;
+    return replaceTilde(replaced);
 }
 
 async function replaceRJCodes(text: string) {
@@ -18,4 +18,8 @@ async function replaceRJCodes(text: string) {
   }
 
   return result;
+}
+
+function replaceTilde(text: string){
+  return text.replace(/[~〜]/g, "ー");
 }
