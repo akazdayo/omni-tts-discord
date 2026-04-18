@@ -11,7 +11,7 @@ class Transcript(BaseModel):
 def is_speaker_available(voice: str)->bool:
     return f"{voice}.wav" in voices
 
-def get_transcript()->Transcript:
+def get_transcript()->list[Transcript]:
     items = []
     with open(f"{BASE_PATH}/transcript.jsonl", "r", encoding="utf-8") as f:
         for line_no, line in enumerate(f, 1):
