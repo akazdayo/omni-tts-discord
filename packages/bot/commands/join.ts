@@ -1,17 +1,7 @@
-import type {
-  ChatInputCommandInteraction,
-  GuildMember} from "discord.js";
-import {
-  MessageFlags,
-  SlashCommandBuilder,
-} from "discord.js";
-import type {
-  AudioPlayer,
-  VoiceConnection} from "@discordjs/voice";
-import {
-  createAudioPlayer,
-  joinVoiceChannel
-} from "@discordjs/voice";
+import type { ChatInputCommandInteraction, GuildMember } from "discord.js";
+import { MessageFlags, SlashCommandBuilder } from "discord.js";
+import type { AudioPlayer, VoiceConnection } from "@discordjs/voice";
+import { createAudioPlayer, joinVoiceChannel } from "@discordjs/voice";
 
 export interface VoiceChannels {
   connection: VoiceConnection;
@@ -27,7 +17,7 @@ export function removeConnections(guildId: string) {
 
 export const data = new SlashCommandBuilder().setName("join").setDescription("じょいん");
 
-export async function execute(interaction: ChatInputCommandInteraction) {
+export const execute = async (interaction: ChatInputCommandInteraction): Promise<void> => {
   const member = interaction.member as GuildMember;
   const vc = member.voice.channel;
   if (!vc) {
@@ -74,4 +64,4 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     voiceChannel: vc.id,
   };
   await interaction.reply({ content: "全部成功したらしい", flags: MessageFlags.Ephemeral });
-}
+};

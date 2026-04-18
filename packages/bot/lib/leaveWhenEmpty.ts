@@ -3,17 +3,25 @@ import { getVoiceConnection } from "@discordjs/voice";
 import { removeConnections } from "../commands/join.js";
 
 export function leaveWhenEmpty(oldState: VoiceState) {
-  const {channel} = oldState;
-  if (!channel) {return;}
+  const { channel } = oldState;
+  if (!channel) {
+    return;
+  }
 
   const connection = getVoiceConnection(channel.guild.id);
-  if (!connection) {return;}
+  if (!connection) {
+    return;
+  }
 
   const botChannelId = channel.guild.members.me?.voice.channelId;
-  if (botChannelId !== channel.id) {return;}
+  if (botChannelId !== channel.id) {
+    return;
+  }
 
   const humanCount = channel.members.filter((member) => !member.user.bot).size;
-  if (humanCount > 0) {return;}
+  if (humanCount > 0) {
+    return;
+  }
 
   connection.destroy();
   removeConnections(channel.guild.id);

@@ -1,4 +1,4 @@
-import type { SlashCommandBuilder, ChatInputCommandInteraction} from "discord.js";
+import type { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 import { Collection } from "discord.js";
 import * as joinCommand from "./join";
 import * as leaveCommand from "./leave";

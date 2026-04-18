@@ -1,7 +1,4 @@
-import type {
-  ChatInputCommandInteraction,
-  Client,
-  StringSelectMenuInteraction} from "discord.js";
+import type { ChatInputCommandInteraction, Client, StringSelectMenuInteraction } from "discord.js";
 import {
   SlashCommandBuilder,
   StringSelectMenuBuilder,

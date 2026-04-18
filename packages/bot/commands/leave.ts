@@ -1,16 +1,11 @@
-import type {
-  ChatInputCommandInteraction} from "discord.js";
-import {
-  SlashCommandBuilder,
-  MessageFlags,
-  EmbedBuilder,
-} from "discord.js";
+import type { ChatInputCommandInteraction } from "discord.js";
+import { SlashCommandBuilder, MessageFlags, EmbedBuilder } from "discord.js";
 import { connections } from "./join";
 
 export const data = new SlashCommandBuilder().setName("leave").setDescription("りーぶ");
 
 export async function execute(interaction: ChatInputCommandInteraction) {
-  const {guildId} = interaction;
+  const { guildId } = interaction;
   if (!guildId) {
     await interaction.reply({
       content: "サーバー内で実行して欲しいかも",

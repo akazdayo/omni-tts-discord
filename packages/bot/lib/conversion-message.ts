@@ -1,11 +1,6 @@
-import { getDlsiteTitle } from "./getDlsiteTitle.js";
+import { getDlsiteTitle } from "./get-dlsite-title.js";
 
-export async function conversionMessage(msg: string) {
-  const replaced = await replaceRJCodes(msg);
-  return replaced;
-}
-
-async function replaceRJCodes(text: string) {
+const replaceRJCodes = async (text: string) => {
   const regex = /rj\d+/gi;
   const matches = [...text.matchAll(regex)];
 
@@ -18,4 +13,6 @@ async function replaceRJCodes(text: string) {
   }
 
   return result;
-}
+};
+
+export const conversionMessage = (message: string) => replaceRJCodes(message);
