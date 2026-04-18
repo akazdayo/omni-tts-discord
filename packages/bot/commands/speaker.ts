@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, StringSelectMenuOptionBuilder, ActionRowBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, Client, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, StringSelectMenuOptionBuilder, ActionRowBuilder } from 'discord.js';
 import { getSpeakers } from '../lib/getSpeakers';
 
 type SelectedSpeakers = Record<string, string>;
@@ -9,17 +9,20 @@ export const data = new SlashCommandBuilder()
 
 export const selectedSpeakers: SelectedSpeakers = {};
 
-const buildButtons = (speakers: string[]) => {
-  const speakerSelectMenu = new StringSelectMenuBuilder()
-  .setCustomId('speakers')
-  .setPlaceholder('Select a speaker')
-  .addOptions(
-    speakers.map(userId =>
-      new StringSelectMenuOptionBuilder()
-        .setLabel(`<@${userId}>`)
-        .setValue(userId)
-    )
+const buildButtons = async (speakers: string[], client: Client) => {
+  const options = await Promise.all(
+    speakers.map(async userId => {
+      const user = await client.users.fetch(userId);
+      return new StringSelectMenuOptionBuilder()
+        .setLabel(user.username)
+        .setValue(userId);
+    })
   );
+
+  const speakerSelectMenu = new StringSelectMenuBuilder()
+    .setCustomId('speakers')
+    .setPlaceholder('Select a speaker')
+    .addOptions(options);
 
   const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(speakerSelectMenu);
   return row;
@@ -27,7 +30,7 @@ const buildButtons = (speakers: string[]) => {
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const speakers = await getSpeakers();
-  const buttons = buildButtons(speakers);
+  const buttons = await buildButtons(speakers, interaction.client);
   await interaction.reply({ components: [buttons] });
 }
 
