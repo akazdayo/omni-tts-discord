@@ -6,7 +6,7 @@ import {
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import type { ChatInputCommandInteraction, Client, StringSelectMenuInteraction } from "discord.js";
-import { getSpeakers } from "../lib/getSpeakers";
+import { getSpeakers } from "../lib/get-speakers";
 
 type SelectedSpeakers = Record<string, string>;
 

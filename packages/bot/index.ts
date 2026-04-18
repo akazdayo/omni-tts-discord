@@ -5,7 +5,7 @@ import { connections, removeConnections } from "./commands/join.js";
 import { handleSpeakerSelect, selectedSpeakers } from "./commands/speaker.js";
 import { createAudioResource } from "@discordjs/voice";
 import { generateVoice } from "./lib/generate.js";
-import { conversionMessage } from "./lib/conversionMessage.js";
+import { conversionMessage } from "./lib/conversion-message.js";
 import { leaveWhenEmpty } from "./lib/leave-when-empty.js";
 
 const client = new Client({
