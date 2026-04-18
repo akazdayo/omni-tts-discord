@@ -1,10 +1,10 @@
 import type { ChatInputCommandInteraction } from "discord.js";
 import { SlashCommandBuilder, MessageFlags, EmbedBuilder } from "discord.js";
-import { connections } from "./join";
+import { connections, removeConnections } from "./join";
 
 export const data = new SlashCommandBuilder().setName("leave").setDescription("りーぶ");
 
-export async function execute(interaction: ChatInputCommandInteraction) {
+export const execute = async (interaction: ChatInputCommandInteraction): Promise<void> => {
   const { guildId } = interaction;
   if (!guildId) {
     await interaction.reply({
@@ -14,7 +14,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
-  const current = connections[guildId];
+  const current = connections.get(guildId);
   if (!current) {
     await interaction.reply({
       content: "今はVCに参加していないかも",
@@ -24,12 +24,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   }
 
   current.connection.destroy();
-  delete connections[guildId];
+  removeConnections(guildId);
 
   const leaveEmbed = new EmbedBuilder()
-    .setColor(0x66FFD4)
+    .setColor(0x66ffd4)
     .setTitle("りーぶ、できたよ！")
     .setDescription("VCから抜けたよ、また呼んでね♡");
 
   await interaction.reply({ embeds: [leaveEmbed] });
-}
+};

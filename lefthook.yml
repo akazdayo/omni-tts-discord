@@ -1,6 +1,15 @@
 pre-commit:
   jobs:
-    - run: bun x ultracite fix
+    - name: oxlint
+      run: bun lint:fix -- {staged_files}
+      glob:
+        - "**/*.js"
+        - "**/*.jsx"
+        - "**/*.ts"
+        - "**/*.tsx"
+      stage_fixed: true
+    - name: oxfmt
+      run: bun fmt:fix -- {staged_files}
       glob:
         - "**/*.js"
         - "**/*.jsx"

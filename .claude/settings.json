@@ -4,7 +4,7 @@
       {
         "hooks": [
           {
-            "command": "bun fix",
+            "command": "bun lint:fix && bun fmt:fix",
             "type": "command"
           }
         ],

@@ -9,17 +9,19 @@ export interface VoiceChannels {
   targetChannel: string;
   voiceChannel: string;
 }
-export const connections: Record<string, VoiceChannels> = {};
+export const connections = new Map<string, VoiceChannels>();
 
-export function removeConnections(guildId: string) {
-  delete connections[guildId];
-}
+export const removeConnections = (guildId: string): void => {
+  connections.delete(guildId);
+};
 
 export const data = new SlashCommandBuilder().setName("join").setDescription("じょいん");
 
 export const execute = async (interaction: ChatInputCommandInteraction): Promise<void> => {
   const member = interaction.member as GuildMember;
   const vc = member.voice.channel;
+  const currentConnection = connections.get(vc?.guild.id ?? "");
+
   if (!vc) {
     await interaction.reply({ content: "先にVC入ってわよ", flags: MessageFlags.Ephemeral });
     return;
@@ -32,15 +34,15 @@ export const execute = async (interaction: ChatInputCommandInteraction): Promise
       flags: MessageFlags.Ephemeral,
     });
     return;
-  } else if (connections[vc.guild.id]?.voiceChannel === vc.id) {
+  } else if (currentConnection?.voiceChannel === vc.id) {
     await interaction.reply({
       content: "もうこのVCに参加してるかも",
       flags: MessageFlags.Ephemeral,
     });
     return;
-  } else if (connections[vc.guild.id]) {
+  } else if (currentConnection) {
     await interaction.reply({
-      content: `もう<#${connections[vc.guild.id].voiceChannel}>に参加してるかも`,
+      content: `もう<#${currentConnection.voiceChannel}>に参加してるかも`,
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -57,11 +59,11 @@ export const execute = async (interaction: ChatInputCommandInteraction): Promise
     await interaction.reply({ content: "発言権限ないかも", flags: MessageFlags.Ephemeral });
     return;
   }
-  connections[vc.guild.id] = {
+  connections.set(vc.guild.id, {
     connection,
     player,
     targetChannel: textChannel,
     voiceChannel: vc.id,
-  };
+  });
   await interaction.reply({ content: "全部成功したらしい", flags: MessageFlags.Ephemeral });
 };

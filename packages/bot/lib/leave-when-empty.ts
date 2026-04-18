@@ -2,7 +2,7 @@ import type { VoiceState } from "discord.js";
 import { getVoiceConnection } from "@discordjs/voice";
 import { removeConnections } from "../commands/join.js";
 
-export function leaveWhenEmpty(oldState: VoiceState) {
+export const leaveWhenEmpty = (oldState: VoiceState): void => {
   const { channel } = oldState;
   if (!channel) {
     return;
@@ -25,4 +25,4 @@ export function leaveWhenEmpty(oldState: VoiceState) {
 
   connection.destroy();
   removeConnections(channel.guild.id);
-}
+};

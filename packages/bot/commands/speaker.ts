@@ -5,7 +5,7 @@ import {
   StringSelectMenuOptionBuilder,
   ActionRowBuilder,
 } from "discord.js";
-import { getSpeakers } from "../lib/getSpeakers";
+import { getSpeakers } from "../lib/get-speakers.js";
 
 type SelectedSpeakers = Record<string, string>;
 
@@ -32,17 +32,19 @@ const buildButtons = async (speakers: string[], client: Client) => {
   return row;
 };
 
-export async function execute(interaction: ChatInputCommandInteraction) {
+export const execute = async (interaction: ChatInputCommandInteraction): Promise<void> => {
   const speakers = await getSpeakers();
   const buttons = await buildButtons(speakers, interaction.client);
   await interaction.reply({ components: [buttons] });
-}
+};
 
-export async function handleSpeakerSelect(interaction: StringSelectMenuInteraction) {
+export const handleSpeakerSelect = async (
+  interaction: StringSelectMenuInteraction,
+): Promise<void> => {
   const [speakerId] = interaction.values;
   if (speakerId) {
     selectedSpeakers[interaction.user.id] = speakerId;
   }
 
   await interaction.deferUpdate();
-}
+};

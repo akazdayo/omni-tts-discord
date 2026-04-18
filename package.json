@@ -7,8 +7,11 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "check": "ultracite check",
-    "fix": "ultracite fix",
+    "fmt": "oxfmt --check",
+    "fmt:fix": "oxfmt",
+    "lint": "oxlint --config oxlint.config.ts --deny-warnings",
+    "lint:type-aware": "oxlint --config oxlint.config.ts --deny-warnings --type-aware",
+    "lint:fix": "oxlint --config oxlint.config.ts --deny-warnings --fix",
     "prepare": "lefthook install"
   },
   "dependencies": {
@@ -19,6 +22,7 @@
     "lefthook": "^2.1.6",
     "oxfmt": "^0.45.0",
     "oxlint": "^1.60.0",
+    "tsgolint": "^0.0.1",
     "ultracite": "7.6.0"
   }
 }

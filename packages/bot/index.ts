@@ -6,7 +6,7 @@ import { handleSpeakerSelect, selectedSpeakers } from "./commands/speaker.js";
 import { createAudioResource } from "@discordjs/voice";
 import { generateVoice } from "./lib/generate.js";
 import { conversionMessage } from "./lib/conversionMessage.js";
-import { leaveWhenEmpty } from "./lib/leaveWhenEmpty.js";
+import { leaveWhenEmpty } from "./lib/leave-when-empty.js";
 
 const client = new Client({
   intents: [
@@ -28,9 +28,13 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
     return;
   }
 
-  if (!interaction.isChatInputCommand()) {return;}
+  if (!interaction.isChatInputCommand()) {
+    return;
+  }
   const command = commands.get(interaction.commandName);
-  if (!command) {return;}
+  if (!command) {
+    return;
+  }
   try {
     await command.execute(interaction);
   } catch {
@@ -39,30 +43,40 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
 });
 
 client.on(Events.MessageCreate, async (message: Message) => {
-  if (message.author.bot) {return;}
-  const voiceChannel = Object.values(connections).find(
+  if (message.author.bot) {
+    return;
+  }
+  const voiceChannel = [...connections.values()].find(
     (vc) => vc.targetChannel === message.channelId,
   );
-  if (!voiceChannel) {return;}
+  if (!voiceChannel) {
+    return;
+  }
 
   const { player } = voiceChannel;
   const messageText = await conversionMessage(message.content);
   const speaker = selectedSpeakers[message.author.id] ?? "874568803256786945";
   const voice = await generateVoice(messageText, speaker);
-  if (!voice) {return;}
+  if (!voice) {
+    return;
+  }
   const audioResouce = createAudioResource(voice);
   player.play(audioResouce);
 });
 
-client.on(Events.VoiceStateUpdate, async (oldState: VoiceState, newState: VoiceState) => {
-  if (oldState.channelId === newState.channelId) {return;}
+client.on(Events.VoiceStateUpdate, (oldState: VoiceState, newState: VoiceState) => {
+  if (oldState.channelId === newState.channelId) {
+    return;
+  }
 
   const guildId = newState.guild.id;
   const botId = newState.client.user.id;
-  const connectionEntry = connections[guildId];
+  const connectionEntry = connections.get(guildId);
 
   if (newState.id === botId) {
-    if (!connectionEntry) {return;}
+    if (!connectionEntry) {
+      return;
+    }
     if (newState.channelId) {
       connectionEntry.voiceChannel = newState.channelId;
       return;

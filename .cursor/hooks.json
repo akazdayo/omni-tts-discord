@@ -2,7 +2,7 @@
   "hooks": {
     "afterFileEdit": [
       {
-        "command": "bun fix"
+        "command": "bun lint:fix && bun fmt:fix"
       }
     ]
   },
