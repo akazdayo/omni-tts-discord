@@ -39,3 +39,8 @@ def generateVoice(params: GenerateParams):
     sf.write(buf, audio[0], 24000, format="WAV")
     return Response(content=buf.getvalue(), media_type="audio/wav")
 
+@app.get("/speaker_list", response_model=list[str])
+def get_speaker_list():
+    ids:list[str] = [x.id for x in transcript]
+    return ids
+
