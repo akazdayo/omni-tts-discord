@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, Collection } from 'discord.js';
 import * as joinCommand from './join';
+import * as leaveCommand from './leave';
 import * as speakerCommand from './speaker';
 
 interface Command {
@@ -8,7 +9,7 @@ interface Command {
 }
 
 export const commands = new Collection<string, Command>();
-export const commandList: Command[] = [joinCommand, speakerCommand];
+export const commandList: Command[] = [joinCommand, speakerCommand, leaveCommand];
 
 for (const cmd of commandList) {
   commands.set(cmd.data.name, cmd);
