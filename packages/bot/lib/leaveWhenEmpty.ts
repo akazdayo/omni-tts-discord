@@ -1,5 +1,6 @@
 import type { VoiceState } from "discord.js";
 import { getVoiceConnection } from "@discordjs/voice";
+import { removeConnectionsForGuild } from "../commands/join.js";
 
 export function leaveWhenEmpty(oldState: VoiceState) {
   const channel = oldState.channel;
@@ -16,4 +17,5 @@ export function leaveWhenEmpty(oldState: VoiceState) {
   if (humanCount > 0) return;
 
   connection.destroy();
+  removeConnectionsForGuild(channel.guild.id);
 }
