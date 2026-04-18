@@ -1,11 +1,12 @@
-import type { ChatInputCommandInteraction, Client, StringSelectMenuInteraction } from "discord.js";
 import {
+  ActionRowBuilder,
+  MessageFlags,
   SlashCommandBuilder,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
-  ActionRowBuilder,
 } from "discord.js";
-import { getSpeakers } from "../lib/get-speakers.js";
+import type { ChatInputCommandInteraction, Client, StringSelectMenuInteraction } from "discord.js";
+import { getSpeakers } from "../lib/getSpeakers";
 
 type SelectedSpeakers = Record<string, string>;
 
@@ -15,11 +16,20 @@ export const data = new SlashCommandBuilder()
 
 export const selectedSpeakers: SelectedSpeakers = {};
 
+const resolveSpeakerLabel = async (speakerId: string, client: Client) => {
+  try {
+    const user = await client.users.fetch(speakerId);
+    return user.username;
+  } catch {
+    return speakerId;
+  }
+};
+
 const buildButtons = async (speakers: string[], client: Client) => {
   const options = await Promise.all(
-    speakers.map(async (userId) => {
-      const user = await client.users.fetch(userId);
-      return new StringSelectMenuOptionBuilder().setLabel(user.username).setValue(userId);
+    speakers.map(async (speakerId) => {
+      const label = await resolveSpeakerLabel(speakerId, client);
+      return new StringSelectMenuOptionBuilder().setLabel(label).setValue(speakerId);
     }),
   );
 
@@ -35,7 +45,7 @@ const buildButtons = async (speakers: string[], client: Client) => {
 export const execute = async (interaction: ChatInputCommandInteraction): Promise<void> => {
   const speakers = await getSpeakers();
   const buttons = await buildButtons(speakers, interaction.client);
-  await interaction.reply({ components: [buttons] });
+  await interaction.reply({ components: [buttons], flags: MessageFlags.Ephemeral });
 };
 
 export const handleSpeakerSelect = async (
