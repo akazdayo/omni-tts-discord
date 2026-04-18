@@ -30,7 +30,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     await interaction.reply({ content: '私テキストの送信権限なさそうかも', flags: MessageFlags.Ephemeral })
     return;
   } else if (connections[vc.guild.id]?.voiceChannel === vc.id) {
-    await interaction.reply({ content: 'もうこのVCに参加してるかも？, flags: MessageFlags.Ephemeral' })
+    await interaction.reply({ content: 'もうこのVCに参加してるかも？', flags: MessageFlags.Ephemeral })
     return;
   } else if (connections[vc.guild.id]) {
     await interaction.reply({ content: `もう<#${connections[vc.guild.id].voiceChannel}>に参加してるかも？`, flags: MessageFlags.Ephemeral })
