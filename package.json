@@ -7,11 +7,11 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "fmt": "oxfmt --check",
-    "fmt:fix": "oxfmt",
-    "lint": "oxlint --config oxlint.config.ts --deny-warnings",
-    "lint:type-aware": "oxlint --config oxlint.config.ts --deny-warnings --type-aware",
-    "lint:fix": "oxlint --config oxlint.config.ts --deny-warnings --fix",
+    "fmt": "vp fmt --check",
+    "fmt:fix": "vp fmt",
+    "lint": "vp lint --deny-warnings",
+    "lint:type-aware": "vp lint --deny-warnings --type-aware",
+    "lint:fix": "vp lint --deny-warnings --fix",
     "prepare": "lefthook install"
   },
   "dependencies": {
@@ -20,9 +20,8 @@
   },
   "devDependencies": {
     "lefthook": "^2.1.6",
-    "oxfmt": "^0.45.0",
-    "oxlint": "^1.60.0",
     "tsgolint": "^0.0.1",
-    "ultracite": "7.6.0"
+    "ultracite": "7.6.0",
+    "vite-plus": "^0.1.18"
   }
 }
