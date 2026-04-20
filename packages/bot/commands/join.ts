@@ -3,13 +3,17 @@ import { MessageFlags, SlashCommandBuilder } from "discord.js";
 import type { AudioPlayer, VoiceConnection } from "@discordjs/voice";
 import { createAudioPlayer, joinVoiceChannel } from "@discordjs/voice";
 
+export interface SpeechQueue {
+  items: { content: string; speaker: string }[];
+  running: boolean;
+}
+
 export interface VoiceChannels {
   connection: VoiceConnection;
   player: AudioPlayer;
   targetChannel: string;
   voiceChannel: string;
-  queue: { content: string; speaker: string }[];
-  processing: boolean;
+  queue: SpeechQueue;
 }
 export const connections = new Map<string, VoiceChannels>();
 
@@ -64,8 +68,10 @@ export const execute = async (interaction: ChatInputCommandInteraction): Promise
   connections.set(vc.guild.id, {
     connection,
     player,
-    processing: false,
-    queue: [],
+    queue: {
+      items: [],
+      running: false,
+    },
     targetChannel: textChannel,
     voiceChannel: vc.id,
   });

@@ -51,7 +51,7 @@ client.on(Events.MessageCreate, (message: Message) => {
     return;
   }
 
-  enqueueSpeech(message.guildId, {
+  enqueueSpeech(voiceChannel.player, voiceChannel.queue, {
     content: message.content,
     speaker: selectedSpeakers[message.author.id] ?? "874568803256786945",
   });
