@@ -8,6 +8,8 @@ export interface VoiceChannels {
   player: AudioPlayer;
   targetChannel: string;
   voiceChannel: string;
+  queue: { content: string; speaker: string }[];
+  processing: boolean;
 }
 export const connections = new Map<string, VoiceChannels>();
 
@@ -62,6 +64,8 @@ export const execute = async (interaction: ChatInputCommandInteraction): Promise
   connections.set(vc.guild.id, {
     connection,
     player,
+    processing: false,
+    queue: [],
     targetChannel: textChannel,
     voiceChannel: vc.id,
   });
