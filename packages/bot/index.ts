@@ -64,7 +64,7 @@ client.on(Events.MessageCreate, async (message: Message) => {
   player.play(audioResouce);
 });
 
-client.on(Events.VoiceStateUpdate, (oldState: VoiceState, newState: VoiceState) => {
+client.on(Events.VoiceStateUpdate, async (oldState: VoiceState, newState: VoiceState) => {
   if (oldState.channelId === newState.channelId) {
     return;
   }
@@ -84,6 +84,16 @@ client.on(Events.VoiceStateUpdate, (oldState: VoiceState, newState: VoiceState) 
     connectionEntry.connection.destroy();
     removeConnections(guildId);
     return;
+  }
+
+  if (connectionEntry && oldState.channelId === connectionEntry.voiceChannel) {
+    const displayName = oldState.member?.displayName ?? oldState.member?.user.username ?? "だれか";
+    const textChannel = await client.channels
+      .fetch(connectionEntry.targetChannel)
+      .catch(() => null);
+    if (textChannel?.isSendable()) {
+      await textChannel.send(`${displayName}が退出しました`);
+    }
   }
 
   leaveWhenEmpty(oldState);
