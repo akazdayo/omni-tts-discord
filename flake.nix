@@ -62,7 +62,6 @@
             treefmtEval.config.build.wrapper
             uv
             gleam
-            erlang
           ];
         };
 
