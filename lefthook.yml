@@ -8,8 +8,8 @@ pre-commit:
         - "**/*.ts"
         - "**/*.tsx"
       stage_fixed: true
-    - name: oxfmt
-      run: bun fmt:fix -- {staged_files}
+    - name: nix fmt
+      run: nix fmt -- --no-cache -- {staged_files}
       glob:
         - "**/*.js"
         - "**/*.jsx"
@@ -17,5 +17,6 @@ pre-commit:
         - "**/*.tsx"
         - "**/*.json"
         - "**/*.jsonc"
-        - "**/*.css"
+        - "**/*.nix"
+        - "**/*.py"
       stage_fixed: true
