@@ -3,10 +3,28 @@ import { Client, Events, GatewayIntentBits } from "discord.js";
 import { commandList, commands } from "./commands/commands.js";
 import { connections, removeConnections } from "./commands/join.js";
 import { handleSpeakerSelect, selectedSpeakers } from "./commands/speaker.js";
-import { createAudioResource } from "@discordjs/voice";
+import { AudioPlayerStatus, createAudioResource } from "@discordjs/voice";
 import { generateVoice } from "./lib/generate.js";
 import { conversionMessage } from "./lib/conversion-message.js";
 import { leaveWhenEmpty } from "./lib/leave-when-empty.js";
+import * as messageQueue from "../message_queue/build/dev/javascript/message_queue/message_queue.mjs";
+
+interface QueueItem {
+  id: string;
+  text: string;
+  speaker: string;
+}
+
+interface QueueState {
+  current?: QueueItem;
+}
+
+interface QueueCommand {
+  item?: QueueItem;
+}
+
+const queueStates = new Map<string, QueueState>();
+const registeredPlayers = new WeakSet<object>();
 
 const client = new Client({
   intents: [
@@ -16,6 +34,75 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
+
+const applyQueueTransition = (
+  guildId: string,
+  transition: (state: QueueState) => [QueueState, Iterable<QueueCommand>],
+) => {
+  const state = queueStates.get(guildId) ?? messageQueue.new$();
+  const [nextState, commandsToRun] = transition(state);
+  queueStates.set(guildId, nextState);
+  return commandsToRun;
+};
+
+const runQueueCommands = async (guildId: string, commandsToRun: Iterable<QueueCommand>) => {
+  for (const command of commandsToRun) {
+    const currentConnection = connections.get(guildId);
+    if (!currentConnection) {
+      return;
+    }
+
+    if (messageQueue.Command$isStart(command)) {
+      const { item } = command;
+      if (!item) {
+        continue;
+      }
+
+      try {
+        const voice = await generateVoice(item.text, item.speaker);
+        if (queueStates.get(guildId)?.current?.id !== item.id) {
+          return;
+        }
+        currentConnection.player.play(createAudioResource(voice));
+      } catch (error) {
+        console.error(error);
+        const nextCommands = applyQueueTransition(guildId, (state) =>
+          messageQueue.current_finished(state, item.id),
+        );
+        await runQueueCommands(guildId, nextCommands);
+      }
+      continue;
+    }
+
+    if (messageQueue.Command$isStop(command)) {
+      currentConnection.player.stop();
+    }
+  }
+};
+
+const runQueueTransition = async (
+  guildId: string,
+  transition: (state: QueueState) => [QueueState, Iterable<QueueCommand>],
+) => {
+  const commandsToRun = applyQueueTransition(guildId, transition);
+  await runQueueCommands(guildId, commandsToRun);
+};
+
+const registerPlayerIdle = (guildId: string) => {
+  const currentConnection = connections.get(guildId);
+  if (!currentConnection || registeredPlayers.has(currentConnection.player)) {
+    return;
+  }
+
+  registeredPlayers.add(currentConnection.player);
+  currentConnection.player.on(AudioPlayerStatus.Idle, () => {
+    const currentId = queueStates.get(guildId)?.current?.id;
+    if (!currentId) {
+      return;
+    }
+    void runQueueTransition(guildId, (state) => messageQueue.current_finished(state, currentId));
+  });
+};
 
 client.once(Events.ClientReady, async (readyClient) => {
   await readyClient.application.commands.set(commandList.map((command) => command.data.toJSON()));
@@ -52,16 +139,16 @@ client.on(Events.MessageCreate, async (message: Message) => {
   if (!voiceChannel) {
     return;
   }
-
-  const { player } = voiceChannel;
-  const messageText = await conversionMessage(message.content);
-  const speaker = selectedSpeakers[message.author.id] ?? "874568803256786945";
-  const voice = await generateVoice(messageText, speaker);
-  if (!voice) {
+  if (!message.guildId) {
     return;
   }
-  const audioResouce = createAudioResource(voice);
-  player.play(audioResouce);
+
+  registerPlayerIdle(message.guildId);
+  const messageText = await conversionMessage(message.content);
+  const speaker = selectedSpeakers[message.author.id] ?? "874568803256786945";
+  const item = messageQueue.new_item(message.id, messageText, speaker);
+
+  void runQueueTransition(message.guildId, (state) => messageQueue.enqueue(state, item));
 });
 
 client.on(Events.VoiceStateUpdate, (oldState: VoiceState, newState: VoiceState) => {
@@ -82,6 +169,7 @@ client.on(Events.VoiceStateUpdate, (oldState: VoiceState, newState: VoiceState) 
       return;
     }
     connectionEntry.connection.destroy();
+    queueStates.delete(guildId);
     removeConnections(guildId);
     return;
   }
