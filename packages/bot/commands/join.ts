@@ -18,7 +18,11 @@ export const onConnectionRemoved = (listener: (guildId: string) => void): void =
 };
 
 export const removeConnections = (guildId: string): void => {
-  connections.delete(guildId);
+  const deleted = connections.delete(guildId);
+  if (!deleted) {
+    return;
+  }
+
   for (const listener of connectionRemoveListeners) {
     listener(guildId);
   }
