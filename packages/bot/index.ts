@@ -1,7 +1,7 @@
 import type { Interaction, Message, VoiceState } from "discord.js";
 import { Client, Events, GatewayIntentBits } from "discord.js";
 import { commandList, commands } from "./commands/commands.js";
-import { connections, removeConnections } from "./commands/join.js";
+import { connections, onConnectionRemoved, removeConnections } from "./commands/join.js";
 import { handleSpeakerSelect, selectedSpeakers } from "./commands/speaker.js";
 import { AudioPlayerStatus, createAudioResource } from "@discordjs/voice";
 import { generateVoice } from "./lib/generate.js";
@@ -25,6 +25,10 @@ interface QueueCommand {
 
 const queueStates = new Map<string, QueueState>();
 const registeredPlayers = new WeakSet<object>();
+
+onConnectionRemoved((guildId) => {
+  queueStates.delete(guildId);
+});
 
 const client = new Client({
   intents: [
@@ -169,7 +173,6 @@ client.on(Events.VoiceStateUpdate, (oldState: VoiceState, newState: VoiceState) 
       return;
     }
     connectionEntry.connection.destroy();
-    queueStates.delete(guildId);
     removeConnections(guildId);
     return;
   }

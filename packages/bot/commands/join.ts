@@ -11,8 +11,17 @@ export interface VoiceChannels {
 }
 export const connections = new Map<string, VoiceChannels>();
 
+const connectionRemoveListeners = new Set<(guildId: string) => void>();
+
+export const onConnectionRemoved = (listener: (guildId: string) => void): void => {
+  connectionRemoveListeners.add(listener);
+};
+
 export const removeConnections = (guildId: string): void => {
   connections.delete(guildId);
+  for (const listener of connectionRemoveListeners) {
+    listener(guildId);
+  }
 };
 
 export const data = new SlashCommandBuilder().setName("join").setDescription("じょいん");
