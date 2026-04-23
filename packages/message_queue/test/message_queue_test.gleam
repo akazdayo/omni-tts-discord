@@ -48,6 +48,13 @@ pub fn clear_stops_processing_test() {
   let #(state, _) = message_queue.enqueue(message_queue.new(), item)
   let #(state, commands) = message_queue.clear(state)
 
-  assert state == Idle([])
+  assert state == Idle
   assert commands == [message_queue.Stop]
+}
+
+pub fn clear_idle_does_not_stop_test() {
+  let #(state, commands) = message_queue.clear(message_queue.new())
+
+  assert state == Idle
+  assert commands == []
 }

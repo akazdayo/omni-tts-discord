@@ -5,7 +5,7 @@ pub type Item {
 }
 
 pub type State {
-  Idle(queue: List(Item))
+  Idle
   Processing(current: Item, queue: List(Item))
 }
 
@@ -21,7 +21,7 @@ pub type Command {
 }
 
 pub fn new() -> State {
-  Idle([])
+  Idle
 }
 
 pub fn new_item(id: String, text: String, speaker: String) -> Item {
@@ -42,11 +42,7 @@ pub fn clear(state: State) -> #(State, List(Command)) {
 
 pub fn update(state: State, event: Event) -> #(State, List(Command)) {
   case state, event {
-    Idle(queue), Enqueue(item) ->
-      case queue {
-        [] -> #(Processing(item, []), [Start(item)])
-        _ -> #(Idle(list.append(queue, [item])), [])
-      }
+    Idle, Enqueue(item) -> #(Processing(item, []), [Start(item)])
 
     Processing(current, queue), Enqueue(item) -> #(
       Processing(current, list.append(queue, [item])),
@@ -55,11 +51,13 @@ pub fn update(state: State, event: Event) -> #(State, List(Command)) {
 
     Processing(current, queue), CurrentFinished(id) if current.id == id ->
       case queue {
-        [] -> #(Idle([]), [])
+        [] -> #(Idle, [])
         [next, ..rest] -> #(Processing(next, rest), [Start(next)])
       }
 
-    _, Clear -> #(Idle([]), [Stop])
+    Processing(_, _), Clear -> #(Idle, [Stop])
+
+    Idle, Clear -> #(Idle, [])
 
     _, _ -> #(state, [])
   }
