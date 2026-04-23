@@ -3,10 +3,9 @@ import { Client, Events, GatewayIntentBits } from "discord.js";
 import { commandList, commands } from "./commands/commands.js";
 import { connections, removeConnections } from "./commands/join.js";
 import { handleSpeakerSelect, selectedSpeakers } from "./commands/speaker.js";
-import { createAudioResource } from "@discordjs/voice";
-import { generateVoice } from "./lib/generate.js";
 import { conversionMessage } from "./lib/conversion-message.js";
 import { leaveWhenEmpty } from "./lib/leave-when-empty.js";
+import { enqueueVoiceMessage, registerVoiceQueuePlayer } from "./lib/voice-queue.js";
 
 const client = new Client({
   intents: [
@@ -52,16 +51,20 @@ client.on(Events.MessageCreate, async (message: Message) => {
   if (!voiceChannel) {
     return;
   }
-
-  const { player } = voiceChannel;
-  const messageText = await conversionMessage(message.content);
-  const speaker = selectedSpeakers[message.author.id] ?? "874568803256786945";
-  const voice = await generateVoice(messageText, speaker);
-  if (!voice) {
+  if (!message.guildId) {
     return;
   }
-  const audioResouce = createAudioResource(voice);
-  player.play(audioResouce);
+
+  registerVoiceQueuePlayer(message.guildId);
+  const messageText = await conversionMessage(message.content);
+  const speaker = selectedSpeakers[message.author.id] ?? "874568803256786945";
+
+  void enqueueVoiceMessage({
+    guildId: message.guildId,
+    id: message.id,
+    speaker,
+    text: messageText,
+  });
 });
 
 client.on(Events.VoiceStateUpdate, (oldState: VoiceState, newState: VoiceState) => {

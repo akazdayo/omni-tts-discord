@@ -21,6 +21,7 @@
           projectRootFile = "flake.nix";
 
           programs = {
+            gleam.enable = true;
             nixfmt.enable = true;
             ruff-format.enable = true;
           };
@@ -60,6 +61,7 @@
             nodejs_24
             treefmtEval.config.build.wrapper
             uv
+            gleam
           ];
         };
 
