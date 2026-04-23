@@ -48,8 +48,10 @@ pub fn update(state: State, event: Event) -> #(State, List(Command)) {
         _ -> #(Idle(list.append(queue, [item])), [])
       }
 
-    Processing(current, queue), Enqueue(item) ->
-      #(Processing(current, list.append(queue, [item])), [])
+    Processing(current, queue), Enqueue(item) -> #(
+      Processing(current, list.append(queue, [item])),
+      [],
+    )
 
     Processing(current, queue), CurrentFinished(id) if current.id == id ->
       case queue {
