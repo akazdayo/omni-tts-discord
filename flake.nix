@@ -1,19 +1,69 @@
 {
   inputs = {
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     utils.url = "github:numtide/flake-utils";
   };
-  outputs = { self, nixpkgs, utils }: utils.lib.eachDefaultSystem (system:
-    let
-      pkgs = nixpkgs.legacyPackages.${system};
-    in
+  outputs =
     {
-      devShell = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          bun
-          nodejs_24
-          uv
-        ];
-      };
-    }
-  );
+      self,
+      nixpkgs,
+      treefmt-nix,
+      utils,
+    }:
+    utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        treefmtEval = treefmt-nix.lib.evalModule pkgs {
+          projectRootFile = "flake.nix";
+
+          programs = {
+            nixfmt.enable = true;
+            ruff-format.enable = true;
+          };
+
+          settings = {
+            formatter.vp = {
+              command = pkgs.writeShellApplication {
+                name = "vp-fmt";
+                runtimeInputs = [ pkgs.bun ];
+                text = ''
+                  exec bun fmt:fix -- "$@"
+                '';
+              };
+              includes = [
+                "*.js"
+                "*.jsx"
+                "*.ts"
+                "*.tsx"
+                "*.json"
+                "*.jsonc"
+              ];
+            };
+
+            global.excludes = [
+              ".direnv/**"
+              ".venv/**"
+              "node_modules/**"
+              "voices/**"
+            ];
+          };
+        };
+      in
+      {
+        devShells.default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            bun
+            nodejs_24
+            treefmtEval.config.build.wrapper
+            uv
+          ];
+        };
+
+        formatter = treefmtEval.config.build.wrapper;
+      }
+    );
 }
