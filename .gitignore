@@ -5,3 +5,4 @@ node_modules
 __pycache__
 voices/*.wav
 voices/*.jsonl
+.pre-commit-config.yaml
