@@ -1,0 +1,8 @@
+{
+  "name": "@tts/server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "uv run fastapi dev main.py"
+  }
+}

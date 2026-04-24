@@ -1,8 +1,8 @@
-import os
+from pathlib import Path
 from pydantic import BaseModel
 
-BASE_PATH = "voices/"
-voices = [x for x in os.listdir(BASE_PATH) if x.endswith(".wav")]
+BASE_PATH = Path(__file__).resolve().parents[2] / "voices"
+voices = [path.name for path in BASE_PATH.iterdir() if path.suffix == ".wav"]
 
 
 class Transcript(BaseModel):
@@ -16,7 +16,7 @@ def is_speaker_available(voice: str) -> bool:
 
 def get_transcript() -> list[Transcript]:
     items = []
-    with open(f"{BASE_PATH}/transcript.jsonl", "r", encoding="utf-8") as f:
+    with (BASE_PATH / "transcript.jsonl").open("r", encoding="utf-8") as f:
         for line_no, line in enumerate(f, 1):
             line = line.strip()
             if not line:
