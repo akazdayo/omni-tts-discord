@@ -13,7 +13,7 @@ class GenerateParams(BaseModel):
 
 
 model = OmniVoice.from_pretrained(
-    "k2-fsa/OmniVoice", device_map="cuda:0", dtype=torch.float16
+    "k2-fsa/OmniVoice", device_map="cuda:0", dtype=torch.float16, load_asr=False
 )
 
 transcript = speaker.get_transcript()
