@@ -8,7 +8,7 @@ This repository combines a Discord bot, a FastAPI voice service, and a Gleam mes
 - `packages/server/`: Python FastAPI service. `main.py` exposes the API and `speaker.py` handles speaker metadata.
 - `packages/message_queue/`: Gleam package compiled to JavaScript for bot queue state transitions. Tests are in `test/`.
 - `voices/`: local voice assets and transcript data.
-- Root files such as `flake.nix`, `vite.config.ts`, `lefthook.yml`, `package.json`, and `pyproject.toml` define tooling.
+- Root files such as `flake.nix`, `vite.config.ts`, `package.json`, and `pyproject.toml` define tooling.
 
 ## Build, Test, and Development Commands
 
