@@ -24,7 +24,7 @@ export const conversionMessage: MessageProxy = async (text: string) => {
   const pipeline: MessageProxy[] = [replaceTilde, replaceRJCodes];
   let replaced = text;
   for (const replace of pipeline) {
-    replaced = await replace(text);
+    replaced = await replace(replaced);
   }
   return replaced;
 };
