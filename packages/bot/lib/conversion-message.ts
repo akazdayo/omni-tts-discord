@@ -1,6 +1,9 @@
 import { getDlsiteTitle } from "./get-dlsite-title.js";
 
-const replaceRJCodes = async (text: string) => {
+type MaybePromise<T> = T | Promise<T>;
+type MessageProxy = (text: string) => MaybePromise<string>;
+
+const replaceRJCodes: MessageProxy = async (text: string) => {
   const regex = /rj\d+/gi;
   const matches = [...text.matchAll(regex)];
 
@@ -15,9 +18,13 @@ const replaceRJCodes = async (text: string) => {
   return result;
 };
 
-const replaceTilde = (text: string) => text.replaceAll(/[~〜]/g, "ー");
+const replaceTilde: MessageProxy = (text: string) => text.replaceAll(/[~〜]/g, "ー");
 
-export const conversionMessage = async (message: string) => {
-  const replaced = await replaceRJCodes(message);
-  return replaceTilde(replaced);
+export const conversionMessage: MessageProxy = async (text: string) => {
+  const pipeline: MessageProxy[] = [replaceTilde, replaceRJCodes];
+  let replaced = text;
+  for (const replace of pipeline) {
+    replaced = await replace(text);
+  }
+  return replaced;
 };
