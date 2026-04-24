@@ -49,7 +49,7 @@ const toQueueCommands = (commands: Iterable<GleamCommand>): QueueCommand[] =>
   });
 
 export class BotMessageQueue {
-  #state: GleamState = messageQueue.initial_state();
+  #state: GleamState = messageQueue.new$();
 
   currentItemId(): string | undefined {
     if (!messageQueue.State$isProcessing(this.#state)) {
@@ -61,19 +61,16 @@ export class BotMessageQueue {
 
   enqueue(item: QueueItem): QueueCommand[] {
     return this.#applyUpdate(
-      messageQueue.enqueue_state(
-        this.#state,
-        messageQueue.new_item(item.id, item.text, item.speaker),
-      ),
+      messageQueue.enqueue(this.#state, messageQueue.new_item(item.id, item.text, item.speaker)),
     );
   }
 
   currentFinished(itemId: string): QueueCommand[] {
-    return this.#applyUpdate(messageQueue.current_finished_state(this.#state, itemId));
+    return this.#applyUpdate(messageQueue.current_finished(this.#state, itemId));
   }
 
   clear(): QueueCommand[] {
-    return this.#applyUpdate(messageQueue.clear_state(this.#state));
+    return this.#applyUpdate(messageQueue.clear(this.#state));
   }
 
   #applyUpdate([nextState, commands]: QueueUpdate): QueueCommand[] {
