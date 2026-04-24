@@ -1,4 +1,4 @@
-import * as messageQueue from "../../message_queue/build/dev/javascript/message_queue/message_queue.mjs";
+import * as messageQueue from "@tts/message-queue";
 
 export interface QueueItem {
   readonly id: string;

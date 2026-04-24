@@ -1,0 +1,17 @@
+{
+  "name": "@tts/message-queue",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./build/dev/javascript/message_queue/message_queue.d.mts",
+      "default": "./build/dev/javascript/message_queue/message_queue.mjs"
+    }
+  },
+  "scripts": {
+    "build": "gleam build --target javascript",
+    "fmt": "gleam format --check src test",
+    "fmt:fix": "gleam format src test",
+    "test": "gleam test"
+  }
+}

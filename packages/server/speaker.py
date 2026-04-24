@@ -1,7 +1,7 @@
 import os
 from pydantic import BaseModel
 
-BASE_PATH = "voices/"
+BASE_PATH = "../../voices/"
 voices = [x for x in os.listdir(BASE_PATH) if x.endswith(".wav")]
 
 

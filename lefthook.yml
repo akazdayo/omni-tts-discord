@@ -1,13 +1,5 @@
 pre-commit:
   jobs:
-    - name: oxlint
-      run: bun lint:fix -- {staged_files}
-      glob:
-        - "**/*.js"
-        - "**/*.jsx"
-        - "**/*.ts"
-        - "**/*.tsx"
-      stage_fixed: true
     - name: nix fmt
       run: nix fmt -- --no-cache -- {staged_files}
       glob:

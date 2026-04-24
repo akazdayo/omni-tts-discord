@@ -32,7 +32,7 @@
                 name = "vp-fmt";
                 runtimeInputs = [ pkgs.bun ];
                 text = ''
-                  exec bun fmt:fix -- "$@"
+                  exec bunx --bun vp fmt "$@"
                 '';
               };
               includes = [
