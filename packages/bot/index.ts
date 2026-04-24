@@ -3,7 +3,7 @@ import { Client, Events, GatewayIntentBits } from "discord.js";
 import { commandList, commands } from "./commands/commands.js";
 import { connections, removeConnections } from "./commands/join.js";
 import { handleSpeakerSelect, selectedSpeakers } from "./commands/speaker.js";
-import { conversionMessage } from "./lib/conversion-message.js";
+import { conversionMessage } from "./lib/message-proxy.js";
 import { leaveWhenEmpty } from "./lib/leave-when-empty.js";
 import { enqueueVoiceMessage, registerVoiceQueuePlayer } from "./lib/voice-queue.js";
 
