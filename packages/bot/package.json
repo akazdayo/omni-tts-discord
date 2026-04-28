@@ -13,6 +13,11 @@
   "dependencies": {
     "@discordjs/voice": "^0.19.2",
     "@tts/message-queue": "workspace:*",
-    "discord.js": "^14.26.3"
+    "discord.js": "^14.26.3",
+    "drizzle-orm": "^0.45.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.13",
+    "drizzle-kit": "^0.31.10"
   }
 }
