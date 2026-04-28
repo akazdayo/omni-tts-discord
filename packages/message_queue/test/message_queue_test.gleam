@@ -6,7 +6,7 @@ pub fn main() -> Nil {
 }
 
 pub fn enqueue_starts_first_item_test() {
-  let item = message_queue.new_item("1", "hello", "speaker")
+  let item = message_queue.new_item("1", "hello", "speaker", "user_id")
   let #(state, commands) = message_queue.enqueue(message_queue.new(), item)
 
   assert state == Processing(item, [])
@@ -14,8 +14,8 @@ pub fn enqueue_starts_first_item_test() {
 }
 
 pub fn enqueue_during_processing_waits_test() {
-  let first = message_queue.new_item("1", "hello", "speaker")
-  let second = message_queue.new_item("2", "world", "speaker")
+  let first = message_queue.new_item("1", "hello", "speaker", "user_id")
+  let second = message_queue.new_item("2", "world", "speaker", "user_id")
   let #(state, _) = message_queue.enqueue(message_queue.new(), first)
   let #(state, commands) = message_queue.enqueue(state, second)
 
@@ -24,8 +24,8 @@ pub fn enqueue_during_processing_waits_test() {
 }
 
 pub fn current_finished_starts_next_item_test() {
-  let first = message_queue.new_item("1", "hello", "speaker")
-  let second = message_queue.new_item("2", "world", "speaker")
+  let first = message_queue.new_item("1", "hello", "speaker", "user_id")
+  let second = message_queue.new_item("2", "world", "speaker", "user_id")
   let #(state, _) = message_queue.enqueue(message_queue.new(), first)
   let #(state, _) = message_queue.enqueue(state, second)
   let #(state, commands) = message_queue.current_finished(state, "1")
@@ -35,7 +35,7 @@ pub fn current_finished_starts_next_item_test() {
 }
 
 pub fn current_finished_ignores_stale_item_test() {
-  let item = message_queue.new_item("1", "hello", "speaker")
+  let item = message_queue.new_item("1", "hello", "speaker", "user_id")
   let #(state, _) = message_queue.enqueue(message_queue.new(), item)
   let #(state, commands) = message_queue.current_finished(state, "old")
 
@@ -44,7 +44,7 @@ pub fn current_finished_ignores_stale_item_test() {
 }
 
 pub fn clear_stops_processing_test() {
-  let item = message_queue.new_item("1", "hello", "speaker")
+  let item = message_queue.new_item("1", "hello", "speaker", "user_id")
   let #(state, _) = message_queue.enqueue(message_queue.new(), item)
   let #(state, commands) = message_queue.clear(state)
 

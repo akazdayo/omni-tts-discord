@@ -26,6 +26,7 @@ const toQueueItem = (item: GleamItem): QueueItem => ({
   id: messageQueue.Item$Item$id(item),
   speaker: messageQueue.Item$Item$speaker(item),
   text: messageQueue.Item$Item$text(item),
+  userId: messageQueue.Item$Item$user_id(item),
 });
 
 const toQueueCommand = (command: GleamCommand): QueueCommand | undefined => {
@@ -62,7 +63,10 @@ export class BotMessageQueue {
 
   enqueue(item: QueueItem): QueueCommand[] {
     return this.#applyUpdate(
-      messageQueue.enqueue(this.#state, messageQueue.new_item(item.id, item.text, item.speaker)),
+      messageQueue.enqueue(
+        this.#state,
+        messageQueue.new_item(item.id, item.text, item.speaker, item.userId),
+      ),
     );
   }
 
