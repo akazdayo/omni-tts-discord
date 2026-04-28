@@ -4,6 +4,7 @@ export interface QueueItem {
   readonly id: string;
   readonly speaker: string;
   readonly text: string;
+  readonly userId: string;
 }
 
 export type QueueCommand =

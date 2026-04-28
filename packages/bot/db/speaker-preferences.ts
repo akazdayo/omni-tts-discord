@@ -18,3 +18,7 @@ export const setSpeakerPreference = async (userId: string, speakerId: string): P
     .values({ speakerId, userId })
     .onConflictDoUpdate({ set: { speakerId }, target: speakerPreferences.userId });
 };
+
+export const resetSpeakerPreference = async (userId: string): Promise<void> => {
+  await setSpeakerPreference(userId, DEFAULT_SPEAKER_ID);
+};

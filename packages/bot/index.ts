@@ -65,6 +65,7 @@ client.on(Events.MessageCreate, async (message: Message) => {
     id: message.id,
     speaker,
     text: messageText,
+    userId: message.author.id,
   });
 });
 

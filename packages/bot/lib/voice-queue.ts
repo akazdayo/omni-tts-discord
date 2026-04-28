@@ -1,5 +1,6 @@
 import { AudioPlayerStatus, createAudioResource } from "@discordjs/voice";
 import type { AudioPlayer } from "@discordjs/voice";
+import { resetSpeakerPreference } from "../db/speaker-preferences.js";
 import { connections, onConnectionRemoved } from "../commands/join.js";
 import { generateVoice } from "./generate.js";
 import { BotMessageQueue } from "./message-queue.js";
@@ -41,23 +42,34 @@ const runQueueCommands = async (
     if (command.type === "start") {
       const { item } = command;
 
-      try {
-        const voice = await generateVoice(item.text, item.speaker);
-        if (queueByGuild.get(guildId) !== queue || queue.currentItemId() !== item.id) {
-          return;
+      const result = await generateVoice(item.text, item.speaker);
+      const voiceResult = result.match(
+        (voice) => ({ ok: true as const, voice }),
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
+        (error) => ({ error, ok: false as const }),
+      );
+
+      if (!voiceResult.ok) {
+        const { error } = voiceResult;
+        if (error.reason === "speaker_not_found") {
+          await resetSpeakerPreference(item.userId);
         }
-        const latestConnection = connections.get(guildId);
-        if (!latestConnection) {
-          return;
-        }
-        latestConnection.player.play(createAudioResource(voice));
-      } catch (error) {
         console.error(error);
         if (queueByGuild.get(guildId) !== queue) {
           return;
         }
         await runQueueCommands(guildId, queue, queue.currentFinished(item.id));
+        continue;
       }
+
+      if (queueByGuild.get(guildId) !== queue || queue.currentItemId() !== item.id) {
+        return;
+      }
+      const latestConnection = connections.get(guildId);
+      if (!latestConnection) {
+        return;
+      }
+      latestConnection.player.play(createAudioResource(voiceResult.voice));
       continue;
     }
 
