@@ -1,8 +1,9 @@
+import { getSpeakerPreference } from "./db/speaker-preferences.js";
 import type { Interaction, Message, VoiceState } from "discord.js";
 import { Client, Events, GatewayIntentBits } from "discord.js";
 import { commandList, commands } from "./commands/commands.js";
 import { connections, removeConnections } from "./commands/join.js";
-import { handleSpeakerSelect, selectedSpeakers } from "./commands/speaker.js";
+import { handleSpeakerSelect } from "./commands/speaker.js";
 import { conversionMessage } from "./lib/message-proxy.js";
 import { leaveWhenEmpty } from "./lib/leave-when-empty.js";
 import { enqueueVoiceMessage, registerVoiceQueuePlayer } from "./lib/voice-queue.js";
@@ -57,13 +58,14 @@ client.on(Events.MessageCreate, async (message: Message) => {
 
   registerVoiceQueuePlayer(message.guildId);
   const messageText = await conversionMessage(message.content);
-  const speaker = selectedSpeakers[message.author.id] ?? "874568803256786945";
+  const speaker = await getSpeakerPreference(message.author.id);
 
   void enqueueVoiceMessage({
     guildId: message.guildId,
     id: message.id,
     speaker,
     text: messageText,
+    userId: message.author.id,
   });
 });
 

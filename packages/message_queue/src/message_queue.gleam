@@ -1,7 +1,7 @@
 import gleam/list
 
 pub type Item {
-  Item(id: String, text: String, speaker: String)
+  Item(id: String, text: String, speaker: String, user_id: String)
 }
 
 pub type State {
@@ -24,8 +24,13 @@ pub fn new() -> State {
   Idle
 }
 
-pub fn new_item(id: String, text: String, speaker: String) -> Item {
-  Item(id:, text:, speaker:)
+pub fn new_item(
+  id: String,
+  text: String,
+  speaker: String,
+  user_id: String,
+) -> Item {
+  Item(id:, text:, speaker:, user_id:)
 }
 
 pub fn enqueue(state: State, item: Item) -> #(State, List(Command)) {

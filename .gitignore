@@ -1,4 +1,6 @@
 node_modules
+*.sqlite
+packages/bot/drizzle/
 .turbo
 .env
 .venv

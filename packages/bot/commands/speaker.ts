@@ -6,15 +6,12 @@ import {
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import type { ChatInputCommandInteraction, Client, StringSelectMenuInteraction } from "discord.js";
+import { setSpeakerPreference } from "../db/speaker-preferences.js";
 import { getSpeakers } from "../lib/get-speakers";
-
-type SelectedSpeakers = Record<string, string>;
 
 export const data = new SlashCommandBuilder()
   .setName("speaker")
   .setDescription("Speakerを変更できるよ");
-
-export const selectedSpeakers: SelectedSpeakers = {};
 
 const resolveSpeakerLabel = async (speakerId: string, client: Client) => {
   try {
@@ -53,7 +50,7 @@ export const handleSpeakerSelect = async (
 ): Promise<void> => {
   const [speakerId] = interaction.values;
   if (speakerId) {
-    selectedSpeakers[interaction.user.id] = speakerId;
+    await setSpeakerPreference(interaction.user.id, speakerId);
   }
 
   await interaction.deferUpdate();
