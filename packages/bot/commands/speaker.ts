@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import type { ChatInputCommandInteraction, Client, StringSelectMenuInteraction } from "discord.js";
 import { setSpeakerPreference } from "../db/speaker-preferences.js";
-import { getSpeakers } from "../lib/get-speakers";
+import { getSpeakers } from "../lib/get-speakers.js";
 
 export const data = new SlashCommandBuilder()
   .setName("speaker")
@@ -48,10 +48,9 @@ export const execute = async (interaction: ChatInputCommandInteraction): Promise
 export const handleSpeakerSelect = async (
   interaction: StringSelectMenuInteraction,
 ): Promise<void> => {
+  await interaction.deferUpdate();
   const [speakerId] = interaction.values;
   if (speakerId) {
     await setSpeakerPreference(interaction.user.id, speakerId);
   }
-
-  await interaction.deferUpdate();
 };
