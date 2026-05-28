@@ -27,8 +27,11 @@ def _voice_paths() -> tuple[Path, ...]:
 
 @lru_cache(maxsize=1)
 def get_transcript() -> list[Transcript]:
-    items = []
     transcript_path = BASE_PATH / "transcript.jsonl"
+    if not transcript_path.exists():
+        return []
+
+    items = []
     with transcript_path.open("r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -44,17 +47,23 @@ def get_transcript_map() -> dict[str, str]:
     return {item.id: item.transcript for item in get_transcript()}
 
 
+@lru_cache(maxsize=1)
+def get_available_speaker_ids() -> tuple[str, ...]:
+    transcript_ids = get_transcript_map()
+    return tuple(
+        path.stem for path in _voice_paths() if path.stem in transcript_ids
+    )
+
+
 def get_speaker_list() -> list[str]:
-    speakers = [path.stem for path in _voice_paths()]
+    speakers = list(get_available_speaker_ids())
     if speakers:
         return [AVERAGE_SPEAKER_ID, *speakers]
     return []
 
 
 def is_speaker_available(voice: str) -> bool:
-    return voice == AVERAGE_SPEAKER_ID or f"{voice}.wav" in {
-        path.name for path in _voice_paths()
-    }
+    return voice == AVERAGE_SPEAKER_ID or voice in get_available_speaker_ids()
 
 
 def _load_audio(path: Path, target_sample_rate: int | None = None) -> tuple[np.ndarray, int]:
@@ -71,16 +80,20 @@ def _load_audio(path: Path, target_sample_rate: int | None = None) -> tuple[np.n
     return waveform, sample_rate
 
 
+@lru_cache(maxsize=1)
 def get_average_transcript() -> str:
-    transcripts = [
-        item.transcript for item in get_transcript() if is_speaker_available(item.id)
-    ]
-    return "\n\n".join(transcripts)
+    transcript_map = get_transcript_map()
+    return "\n\n".join(transcript_map[speaker_id] for speaker_id in get_available_speaker_ids())
 
 
+@lru_cache(maxsize=8)
 def build_average_reference_audio(target_sample_rate: int) -> tuple[np.ndarray, int]:
+    available_speaker_ids = set(get_available_speaker_ids())
     waveforms = []
     for path in _voice_paths():
+        if path.stem not in available_speaker_ids:
+            continue
+
         waveform, sample_rate = _load_audio(path, target_sample_rate)
         if sample_rate != target_sample_rate:
             raise RuntimeError("Failed to resample reference audio to the target sample rate")
