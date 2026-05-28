@@ -9,11 +9,21 @@ import type { ChatInputCommandInteraction, Client, StringSelectMenuInteraction }
 import { setSpeakerPreference } from "../db/speaker-preferences.js";
 import { getSpeakers } from "../lib/get-speakers.js";
 
+export const AVERAGE_SPEAKER_ID = "average";
+const RESERVED_SPEAKER_LABELS: Record<string, string> = {
+  [AVERAGE_SPEAKER_ID]: "平均",
+};
+
 export const data = new SlashCommandBuilder()
   .setName("speaker")
   .setDescription("Speakerを変更できるよ");
 
 const resolveSpeakerLabel = async (speakerId: string, client: Client) => {
+  const reservedLabel = RESERVED_SPEAKER_LABELS[speakerId];
+  if (reservedLabel) {
+    return reservedLabel;
+  }
+
   try {
     const user = await client.users.fetch(speakerId);
     return user.username;
