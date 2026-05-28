@@ -1,12 +1,12 @@
 import io
 import os
 
-from fastapi import FastAPI, HTTPException, Response
 import soundfile as sf
 import speaker
-from pydantic import BaseModel
-from omnivoice import OmniVoice
 import torch
+from fastapi import FastAPI, HTTPException, Response
+from omnivoice import OmniVoice
+from pydantic import BaseModel
 
 
 class GenerateParams(BaseModel):
@@ -43,8 +43,6 @@ model = OmniVoice.from_pretrained(
     "k2-fsa/OmniVoice", device_map=device, dtype=dtype, load_asr=False
 )
 
-transcript = {item.id: item.transcript for item in speaker.get_transcript()}
-
 app = FastAPI()
 
 
@@ -57,10 +55,13 @@ def read_root():
 def generateVoice(params: GenerateParams):
     if not speaker.is_speaker_available(params.speaker):
         raise HTTPException(404, "Selected speaker is not found")
+    ref_audio, ref_text = speaker.get_reference_inputs(
+        params.speaker, model.sampling_rate
+    )
     audio = model.generate(
         text=params.text,
-        ref_audio=f"{speaker.BASE_PATH}/{params.speaker}.wav",
-        ref_text=transcript.get(params.speaker),
+        ref_audio=ref_audio,
+        ref_text=ref_text,
         language_id=262,
     )
 
@@ -71,4 +72,4 @@ def generateVoice(params: GenerateParams):
 
 @app.get("/speaker_list", response_model=list[str])
 def get_speaker_list():
-    return list(transcript)
+    return speaker.get_speaker_list()

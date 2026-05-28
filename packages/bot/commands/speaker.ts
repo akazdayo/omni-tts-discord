@@ -14,6 +14,10 @@ export const data = new SlashCommandBuilder()
   .setDescription("Speakerを変更できるよ");
 
 const resolveSpeakerLabel = async (speakerId: string, client: Client) => {
+  if (speakerId === "average") {
+    return "平均";
+  }
+
   try {
     const user = await client.users.fetch(speakerId);
     return user.username;
