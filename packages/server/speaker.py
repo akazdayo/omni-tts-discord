@@ -55,15 +55,22 @@ def get_available_speaker_ids() -> tuple[str, ...]:
     )
 
 
+def is_speaker_generatable(voice: str) -> bool:
+    available_speaker_ids = get_available_speaker_ids()
+    if voice == AVERAGE_SPEAKER_ID:
+        return bool(available_speaker_ids)
+    return voice in available_speaker_ids
+
+
 def get_speaker_list() -> list[str]:
     speakers = list(get_available_speaker_ids())
-    if speakers:
+    if is_speaker_generatable(AVERAGE_SPEAKER_ID):
         return [AVERAGE_SPEAKER_ID, *speakers]
-    return []
+    return speakers
 
 
 def is_speaker_available(voice: str) -> bool:
-    return voice == AVERAGE_SPEAKER_ID or voice in get_available_speaker_ids()
+    return is_speaker_generatable(voice)
 
 
 def _load_audio(path: Path, target_sample_rate: int | None = None) -> tuple[np.ndarray, int]:
