@@ -57,7 +57,8 @@ client.on(Events.MessageCreate, async (message: Message) => {
   }
 
   registerVoiceQueuePlayer(message.guildId);
-  const messageText = await conversionMessage(message.content);
+  const mentionLabels = new Map(message.mentions.users.map((user) => [user.id, user.username]));
+  const messageText = await conversionMessage(message.content, mentionLabels);
   const speaker = await getSpeakerPreference(message.author.id);
 
   void enqueueVoiceMessage({
